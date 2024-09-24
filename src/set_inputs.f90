@@ -26,6 +26,8 @@ subroutine set_inputs
   use ModRCMR
   use ModIoUnit, only : UnitTmp_
 
+  use ModIndicesInterfaces, only: get_f107
+  
   implicit none
 
   integer, external :: bad_outputtype
@@ -49,6 +51,9 @@ subroutine set_inputs
   real :: EDC_est_tmp
   real*8 :: DTime
   logical :: HasSetAuroraMods = .false.
+
+  ! This is for testing the F107 at the end of this subroutine:
+  real :: f107_test
 
   call report("set_inputs",1)
 
@@ -1691,14 +1696,17 @@ subroutine set_inputs
         case ("#EUV_DATA")
            call read_in_logical(UseEUVData, iError)
            call read_in_string(cEUVFile, iError)
-
-           if (UseEUVData) call Set_Euv(iError, CurrentTime, EndTime)
            if (iError /= 0) then
-              write(*,*) 'Incorrect format for #EUV_DATA'
-              write(*,*) 'This is for a FISM or some other solar spectrum file.'
-              write(*,*) '#EUV_DATA'
-              write(*,*) 'UseEUVData            (logical)'
-              write(*,*) 'cEUVFile              (string)'
+             write(*,*) 'Incorrect format for #EUV_DATA'
+             write(*,*) 'This is for a FISM or some other solar spectrum file.'
+             write(*,*) '#EUV_DATA'
+             write(*,*) 'UseEUVData            (logical)'
+             write(*,*) 'cEUVFile              (string)'
+           else
+             if (UseEUVData) call Set_Euv(iError, CurrentTime, EndTime)
+             if (iError /= 0) then
+               call stop_gitm("Stopping after set_euv in set_inputs. Error in EUV data. Check times!")
+             endif
            endif
 
         case ("#ECLIPSE")
@@ -1819,8 +1827,7 @@ subroutine set_inputs
                 EndTime+TimeDelayHighLat, doUseAeForHp)
 
            if (iError /= 0) then
-              write(*,*) "read indices was NOT successful (SME file)"
-              IsDone = .true.
+             call stop_gitm("read SME indices was NOT successful (SME file) - check times!")
            endif
 
            ! If the onset file is called "none", then it will
@@ -1831,8 +1838,7 @@ subroutine set_inputs
                 EndTime+TimeDelayHighLat)
 
            if (iError /= 0) then
-              write(*,*) "read indices was NOT successful (onset file)"
-              IsDone = .true.
+            call stop_gitm("read AL onset lisy was NOT successful (onset file) - check times!")
            else
               UseVariableInputs = .true.
            endif
@@ -1914,9 +1920,19 @@ subroutine set_inputs
      call stop_gitm("Must Stop!!")
   endif
 
-  RestartTime = CurrentTime
+  ! We need to check to see if the current time and end time are
+  ! larger than the last F107 time.  If that is the case, the code
+  ! should stop
+  if (iDebugLevel > 0) write(*,*) 'testing indices.... ', currenttime
+  call check_all_indices(CurrentTime, iError)
+  if (iError == 0) then
+   call check_all_indices(EndTime, iError)
+  endif
+  if (iError /= 0) then
+   call stop_gitm("Issue with Indices! Check the file(s) times!")
+  endif
 
-!  KappaTemp0 = 3.6e-4
+  RestartTime = CurrentTime
 
 contains
 
