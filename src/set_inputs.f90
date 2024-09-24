@@ -818,9 +818,13 @@ subroutine set_inputs
            if (iError /= 0) then
               write(*,*) 'Incorrect format for #AMIEFILES:'
               write(*,*) ''
+              write(*,*) 'These are for the input files for electrodynamics.'
+              write(*,*) 'If the southern hemisphere is called "mirror", then it takes the north,'
+              write(*,*) 'flips the potential and multiplies it by -1.'
+              write(*,*) ''
               write(*,*) '#AMIEFILES'
               write(*,*) 'cAMIEFileNorth  (string)'
-              write(*,*) 'cAMIEFileSouth  (string)'
+              write(*,*) 'cAMIEFileSouth  (string - can use "mirror")'
               IsDone = .true.
            else
               if (index(cAMIEFileNorth,"none") == 0 .and. &
@@ -1017,7 +1021,11 @@ subroutine set_inputs
         case ("#AUSMSOLVER")
            call read_in_logical(UseAUSMSolver, iError)
            if (iError /= 0) then
-              write(*,*) 'Incorrect format for #VERTICALSOURCES:'
+              write(*,*) 'Incorrect format for #AUSMSOLVER:'
+              write(*,*) ''
+              write(*,*) 'This is for a dramatically improved vertical solver.'
+              write(*,*) 'It subtracts a hydrostatic equilibrium and then solves for'
+              write(*,*) 'the differences from that. For Earth, you should use this!'
               write(*,*) ''
               write(*,*) '#AUSMSOLVER'
               write(*,*) "Use AUSM Solver      (logical)"
