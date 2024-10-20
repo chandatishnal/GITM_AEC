@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import os
@@ -44,6 +44,10 @@ def parse_args_post():
 
     parser.add_argument('-q',
                         help = 'Run with verbose turned off',
+                        action = 'store_true')
+    
+    parser.add_argument('-untar',
+                        help = 'look for tgz files, and process those',
                         action = 'store_true')
     
     parser.add_argument('-norm',
@@ -396,7 +400,7 @@ def transfer_model_output_files(user, server, dir):
 # Post process and then transfer files once:
 # ----------------------------------------------------------------------
 
-def do_loop(doTarZip, user, server, dir, IsRemote):
+def do_loop(doTarZip, doUntar, user, server, dir, IsRemote):
 
     DidWork = True
 
@@ -422,9 +426,24 @@ def do_loop(doTarZip, user, server, dir, IsRemote):
     if (doTarZip):
         DidWork = tar_and_zip_gitm()
     else:
-        processDir = 'UA/data' 
-        DidWork = post_process_gitm(processDir, DoRm, isVerbose = IsVerbose)
-        #DidWork = post_process_gitm()
+
+        if (doUntar):
+            processDir = './'
+            tgzFiles = sorted(glob(processDir + '*.tgz'))
+            for tgz in tgzFiles:
+                command = 'tar -xvzf '+tgz
+                DidWork = run_command(command)
+                DidWork = post_process_gitm(processDir, \
+                                            DoRm, \
+                                            isVerbose = IsVerbose)
+                if ((DidWork) and (DoRm)):
+                    command = 'rm -f ' + tgz
+                    DidWork = run_command(command)
+                
+        else:
+            processDir = 'UA/data' 
+            DidWork = post_process_gitm(processDir, DoRm, isVerbose = IsVerbose)
+            #DidWork = post_process_gitm()
         
     # 4 - Check if remote data directory exists, make it if it doesn't:
     data_remote = '/data'
@@ -477,6 +496,7 @@ if __name__ == '__main__':  # main code block
 
     # make local variables for arguments:
     doTarZip = args.tgz
+    doUntar = args.untar
     IsVerbose = not args.q
     if (args.norm):
         DoRm = False
@@ -492,7 +512,7 @@ if __name__ == '__main__':  # main code block
         IsRemote, user, server, dir = load_remote_file(args)
         print('Move files to remote system? ', IsRemote)
         
-        DidWork = do_loop(doTarZip, user, server, dir, IsRemote)
+        DidWork = do_loop(doTarZip, doUntar, user, server, dir, IsRemote)
         if (DidWork):
             # Check if stop file exists:
             stopCheck = check_for_stop_file()
