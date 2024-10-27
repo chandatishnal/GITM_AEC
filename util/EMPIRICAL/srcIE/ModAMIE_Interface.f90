@@ -87,19 +87,17 @@ contains
     if (allocated(AMIE_Lats)) deallocate(AMIE_Lats)
     allocate(AMIE_Lats(AMIE_nLats + nCellsPad), stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array AMIE_Lats in "
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIE_Lats")
     endif
 
     if (allocated(AMIE_Mlts)) deallocate(AMIE_Mlts)
     allocate(AMIE_Mlts(AMIE_nMlts), stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array Mlts in "
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIE_Mlts")
     endif
 
-    ! ------------------------------------------------------------
-    ! This is the variable that holds all of the variables to allo
+    ! --------------------------------------------------------------
+    ! This is the variable that holds all of the variables to allow
     ! for a more generalized get variable function
 
     if (AMIE_iDebugLevel > 1) &
@@ -114,8 +112,7 @@ contains
              AMIE_nBlks), &
              stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array AMIE_Storage in readAMIEoutput"
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIE_Storage")
     endif
 
     if (AMIE_iDebugLevel > 1) write(*, *) '  --> allocated the big array!'
@@ -136,10 +133,10 @@ contains
     ! Generic AMIE Value:
 
     allocate(AMIE_Value( &
-             AMIE_nMlts, AMIE_nLats + nCellsPad, AMIE_nTimes, AMIE_nBlks), stat=iError)
+         AMIE_nMlts, AMIE_nLats + nCellsPad, AMIE_nTimes, AMIE_nBlks), &
+         stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array AMIE_Value in "
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIE_Value")
     endif
 
     AMIE_Value = 0.0
@@ -150,8 +147,7 @@ contains
     allocate(AMIE_Interpolated( &
              AMIE_nMlts, AMIE_nLats + nCellsPad, AMIE_nBlks), stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array AMIE_Interpolated in "
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIE_Inter...")
     endif
 
     AMIE_Value = 0.0
@@ -161,8 +157,7 @@ contains
 
     allocate(AMIE_Time(AMIE_nTimes, 2), stat=iError)
     if (iError /= 0) then
-      write(*, *) "Error in allocating array AMIETimes in "
-      stop
+      call report_error_and_crash(1, "Error in allocating array AMIETimes")
     endif
 
     if (AMIE_iDebugLevel > 1) write(*, *) '  --> done allocating!'
@@ -209,19 +204,22 @@ contains
 
     if ((iMap_(iIon_diff_eflux_) > 0) .and. (iMap_(iIon_diff_avee_) > 0)) then
       useIons = .true.
-      if (AMIE_iDebugLevel > 1) write(*, *) "Input Electrodynamics is using Ions!"
+      if (AMIE_iDebugLevel > 1) &
+           write(*, *) "Input Electrodynamics is using Ions!"
     else
       useIons = .false.
     endif
     if ((iMap_(iEle_mono_eflux_) > 0) .and. (iMap_(iEle_mono_avee_) > 0)) then
       useMono = .true.
-      if (AMIE_iDebugLevel > 1) write(*, *) "Input Electrodynamics is using Mono!"
+      if (AMIE_iDebugLevel > 1) &
+           write(*, *) "Input Electrodynamics is using Mono!"
     else
       useMono = .false.
     endif
     if ((iMap_(iEle_wave_eflux_) > 0) .and. (iMap_(iEle_wave_avee_) > 0)) then
       useWave = .true.
-      if (AMIE_iDebugLevel > 1) write(*, *) "Input Electrodynamics is using Ions!"
+      if (AMIE_iDebugLevel > 1) &
+           write(*, *) "Input Electrodynamics is using Ions!"
     else
       useWave = .false.
     endif
