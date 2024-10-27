@@ -105,6 +105,7 @@ subroutine init_get_potential
       Lines(6) = ""
 
       UseIMF = .false.
+      UseHPI = .false.
 
     endif
 
@@ -149,8 +150,6 @@ subroutine init_get_potential
       write(*, *) "Error : ", iError
       call stop_gitm("Stopping in get_potential")
     endif
-
-    write(*, *) 'done with reading amie north!'
 
     if (index(cAMIEFileSouth, 'mirror') > 0) then
       call AMIE_SetFileName(cAMIEFileNorth)
