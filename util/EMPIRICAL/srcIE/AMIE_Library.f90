@@ -114,7 +114,10 @@ subroutine AMIE_GetPotentialY_New(TimeIn, Method, PotentialYOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: PotentialYOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: PotentialYOut
   integer, intent(out) :: iError
 
   call AMIE_GetValue_New2(iPotentialY_, TimeIn, Method, iError)
@@ -135,7 +138,10 @@ subroutine AMIE_GetPotential_New(TimeIn, Method, PotentialOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: PotentialOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: PotentialOut
   integer, intent(out) :: iError
 
   call AMIE_GetValue_New2(iPotential_, TimeIn, Method, iError)
@@ -197,7 +203,10 @@ subroutine AMIE_GetIonEFlux_New(TimeIn, Method, IonEFluxOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: IonEFluxOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: IonEFluxOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -221,7 +230,10 @@ subroutine AMIE_GetIonAveE_New(TimeIn, Method, IonAveEOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: IonAveEOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: IonAveEOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -245,7 +257,10 @@ subroutine AMIE_GetEleWaveEflux_New(TimeIn, Method, EleWaveEfluxOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: EleWaveEFluxOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: EleWaveEFluxOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -269,7 +284,10 @@ subroutine AMIE_GetEleWaveAveE_New(TimeIn, Method, EleWaveAveEOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: EleWaveAveEOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: EleWaveAveEOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -293,7 +311,10 @@ subroutine AMIE_GetEleMonoEflux_New(TimeIn, Method, EleMonoEfluxOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: EleMonoEFluxOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: EleMonoEFluxOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -317,7 +338,10 @@ subroutine AMIE_GetEleMonoAveE_New(TimeIn, Method, EleMonoAveEOut, iError)
 
   real*8, intent(in) :: TimeIn
   integer, intent(in) :: Method
-  real, dimension(AMIE_nMLTs, AMIE_nLats, AMIE_nBLKs), intent(out) :: EleMonoAveEOut
+  real, dimension( &
+       AMIE_nMLTs, &
+       AMIE_nLats, &
+       AMIE_nBLKs), intent(out) :: EleMonoAveEOut
   integer, intent(out) :: iError
 
   if (useIons) then
@@ -415,8 +439,8 @@ subroutine AMIE_GetValue_New2(iVarIn, TimeIn, Method, iError)
       else
         ! Reverse the North block of AMIE data for now...
         do iLat = AMIE_nLats, 1, -1
-          AMIE_Interpolated(1:AMIE_nMLTs, iLat, iBLK) = &
-            AMIE_Storage(iVarIn, 1:AMIE_nMLTs, AMIE_nLats - iLat + 1, iTime, iBLK)
+           AMIE_Interpolated(1:AMIE_nMLTs, iLat, iBLK) = &
+                AMIE_Storage(iVarIn, 1:AMIE_nMLTs, AMIE_nLats - iLat + 1, iTime, iBLK)
         enddo
       endif
 
@@ -433,15 +457,19 @@ subroutine AMIE_GetValue_New2(iVarIn, TimeIn, Method, iError)
       ! on the selected point
       if (iBLK == AMIE_South_) then
         AMIE_Interpolated(1:AMIE_nMLTs, 1:AMIE_nLats, iBLK) = &
-          (1.0 - dt)*AMIE_Storage(iVarIn, 1:AMIE_nMLTs, 1:AMIE_nLats, iTime, iBLK) + &
-          dt*AMIE_Storage(iVarIn, 1:AMIE_nMLTs, 1:AMIE_nLats, iTime - 1, iBLK)
+             (1.0 - dt) * &
+             AMIE_Storage(iVarIn, 1:AMIE_nMLTs, 1:AMIE_nLats, iTime, iBLK) + &
+             dt * &
+             AMIE_Storage(iVarIn, 1:AMIE_nMLTs, 1:AMIE_nLats, iTime - 1, iBLK)
       else
         ! Reverse the 2nd block of AMIE data for now...
         do iLat = AMIE_nLats, 1, -1
           iL = AMIE_nLats - iLat + 1
           AMIE_Interpolated(1:AMIE_nMLTs, iLat, iBLK) = &
-            (1.0 - dt)*AMIE_Storage(iVarIn, 1:AMIE_nMLTs, iL, iTime, iBLK) + &
-            dt*AMIE_Storage(iVarIn, 1:AMIE_nMLTs, iL, iTime - 1, iBLK)
+               (1.0 - dt) * &
+               AMIE_Storage(iVarIn, 1:AMIE_nMLTs, iL, iTime, iBLK) + &
+               dt * &
+               AMIE_Storage(iVarIn, 1:AMIE_nMLTs, iL, iTime - 1, iBLK)
         enddo
       endif
     endif
