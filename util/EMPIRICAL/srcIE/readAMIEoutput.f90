@@ -83,7 +83,8 @@ subroutine readAMIEoutput(iBLK, IsMirror, iDebugGitm, iError)
   AMIE_iDebugLevel = iDebugGitm
 
   iError = 0
-  if (AMIE_iDebugLevel >= 0) write(*, *) '> reading AMIE file : ', trim(AMIE_FileName)
+  if (AMIE_iDebugLevel >= 0) &
+       write(*, *) '> reading AMIE file : ', trim(AMIE_FileName)
   open(UnitTmp_, &
        file=AMIE_FileName, &
        status='old', &
@@ -91,7 +92,7 @@ subroutine readAMIEoutput(iBLK, IsMirror, iDebugGitm, iError)
        iostat=iError)
   if (iError .ne. 0) then
     write(*, *) "Error opening file:", trim(AMIE_FileName)
-    stop
+    call report_error_and_crash(1, "Error trying to open AMIE file")
   endif
   AMIE_nLats = 0
   IsBinary = .true.
@@ -141,7 +142,7 @@ subroutine readAMIEoutput(iBLK, IsMirror, iDebugGitm, iError)
   allocate(AllData(AMIE_nMlts, AMIE_nLats, nFields), stat=iError)
   if (iError /= 0) then
     write(*, *) "Error in allocating array AllData in "
-    stop
+    call report_error_and_crash(1, "Error trying o allocate AllData in AMIE")
   endif
 
   ! ---------------------------------------------------------------
@@ -161,7 +162,7 @@ subroutine readAMIEoutput(iBLK, IsMirror, iDebugGitm, iError)
 
   if (nFields > nFieldsMax) then
     write(*, *) "Maximum number of fields in AMIE is ", nFieldsMax
-    stop
+    call report_error_and_crash(1, "Error: too many fields in AMIE")
   endif
 
   AMIE_Lats = 90.0 - AMIE_Lats
@@ -177,7 +178,7 @@ subroutine readAMIEoutput(iBLK, IsMirror, iDebugGitm, iError)
     allocate(TempLats(AMIE_nLats + nCellsPad), stat=iError)
     if (iError /= 0) then
       write(*, *) "Error in allocating array TempLats in "
-      stop
+      call report_error_and_crash(1, "Error: allocating templats in AMIE")
     endif
     TempLats = AMIE_Lats
     do i = 1, AMIE_nLats
